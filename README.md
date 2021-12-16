@@ -6,10 +6,10 @@ Background
 
 This library provides a command line interface to unzip warc and wacz files.
 
-Builds off of the `warcio library <https://github.com/webrecorder/warcio>` to read and validate warc files and the `py-wacz library <https://github.com/webrecorder/py-wacz>` to validate wacz files.
+Builds off of the [warcio library] (<https://github.com/webrecorder/warcio>) to read and validate warc files and the [py-wacz library] (<https://github.com/webrecorder/py-wacz>) to validate wacz files.
 
 Both libraries are provided by
-`Webrecorder <https://github.com/webrecorder/webrecorder>`
+[Webrecorder] (https://github.com/webrecorder/webrecorder)
 
 Setup
 ----------

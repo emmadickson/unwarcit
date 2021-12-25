@@ -1,4 +1,4 @@
-import os, gzip, json, zipfile, pathlib
+import os, gzip, json, zipfile, pathlib, uuid
 from wacz.validate import Validation, OUTDATED_WACZ
 from unwarcit.util import get_version, generate_datapackage, is_gz_file, write_out_file
 from os.path import isfile, join, exists
@@ -41,7 +41,7 @@ class Unwarcit:
 
             self.unwrap_warc(key, file_path, self.unwarc)
 
-            print("Generating Datapackage.json file")
+            print("\nGenerating Datapackage.json file")
             datapackage = generate_datapackage(self.unwarc, key, self.output)
             datapackage_file = open(f"{self.output}/{key}/datapackage.json", "w")
             datapackage_file.write(datapackage)
@@ -147,29 +147,39 @@ class Unwarcit:
             for record in ArchiveIterator(stream):
                 if record.rec_type == "response":
                     name = record.rec_headers.get_header("WARC-Target-URI")
-
                     file_name = name.split("/")[-1].split("?")[0].split("@")[0]
-
-                    if file_name == "":
-                        file_name = "index.html"
-
-                    print(f"Detected {file_name}")
-                    fetch_type = file_name.split(".")
-                    if len(fetch_type) <= 1:
-                        fetch_type = "unrecognized"
-                    else:
-                        fetch_type = fetch_type[-1]
-
                     content = record.content_stream().read()
-                    unwarc[file]["found_files"].append(
-                        {
-                            "url": name,
-                            "file_name": file_name,
-                            "detected_type": fetch_type,
-                            "content": content,
-                        }
-                    )
-                    write_out_file(self.output, file, fetch_type, file_name, content)
+                    content_length = len(content)
+                    file_uuid = record.rec_headers.get_header("WARC-Record-ID")
+                    file_uuid = file_uuid.split(":")[-1][0:-1]
+
+                    if (content_length != 0):
+
+                        if (file_name == '' and content_length > 0):
+                            file_name = str(uuid.uuid4())
+                            #print(f"\nA file with no name but some content has been detected, it will be stored as an 'unrecognized' type with the name {file_name}")
+
+                        file_name = (file_name[-30:]) if len(file_name) > 250 else file_name
+
+                        fetch_type = file_name.split(".")
+                        if len(fetch_type) > 1:
+                            fetch_type = fetch_type[-1]
+                        elif file_name in ['css', 'html', 'jpg', 'js', 'json', 'php', 'png', 'svg']:
+                            fetch_type = file_name
+                        else:
+                            fetch_type = 'unrecognized'
+
+
+                        unwarc[file]["found_files"].append(
+                            {
+                                "url": name,
+                                "file_name": file_name,
+                                "detected_type": fetch_type,
+                                "content": content,
+                            }
+                        )
+
+                        write_out_file(self.output, file, fetch_type, file_name, content, file_uuid)
 
     def validate_wacz(self, file):
         """

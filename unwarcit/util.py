@@ -1,6 +1,6 @@
 import pathlib, datetime, json, pkg_resources
 from wacz.util import WACZ_VERSION, support_hash_file, now
-
+from os.path import exists
 
 def get_version():
     """
@@ -89,7 +89,7 @@ def is_gz_file(filepath):
         return test_f.read(2) == b"\x1f\x8b"
 
 
-def write_out_file(output, original_file, file_path, file_name, content):
+def write_out_file(output, original_file, file_path, file_name, content, file_uuid):
     """
     Writes the passed information to the given file path
     Parameters
@@ -102,7 +102,8 @@ def write_out_file(output, original_file, file_path, file_name, content):
         individual file name
     content : str
         content to be written to file
-
+    file_uuid: str
+        uuid to be added to file name if it already exists
     Returns
     -------
     None
@@ -110,6 +111,9 @@ def write_out_file(output, original_file, file_path, file_name, content):
     """
     path = f"{output}/{original_file}/downloaded_files/{file_path}"
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+    if (exists(f"{path}/{file_name}")):
+        file_name = file_uuid + file_name
     f = open(f"{path}/{file_name}", "wb")
+    print(f"Writing out {file_name} to {path}/{file_name}")
     f.write(content)
     return

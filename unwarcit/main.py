@@ -1,6 +1,6 @@
 from unwarcit.unwarcit import Unwarcit
 from unwarcit.util import get_version
-import sys
+import sys, datetime
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 
@@ -25,7 +25,7 @@ def main(args=None):
     parser.add_argument(
         "--output",
         help="""Path where the results will be placed. Default is 'output'.""",
-        default="output",
+        default=f"output_{datetime.datetime.now().strftime('%Y-%m-%d:%s')}",
     )
 
     arguments = parser.parse_args(args=args)

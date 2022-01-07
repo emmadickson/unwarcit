@@ -27,6 +27,7 @@ setup(
     author="Emma Dickson",
     author_email="emma.jk.dickson@gmail.com",
     packages=find_packages(),
+    license="Apache 2.0",
     url="https://github.com/emmadickson/unwarcit",
     description="Unzip and Access Files in Web Archives (WARC) and WACZ Files",
     entry_points="""
